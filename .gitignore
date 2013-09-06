@@ -1,0 +1,3 @@
+*.pyo
+*.pyc
+db_credentials.php
