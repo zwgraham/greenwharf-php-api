@@ -23,37 +23,69 @@ function query_and_emit_csv($fobj, $query) {
 }
 
 function make_weather_csv( $fobj, $start_ts=NULL, $end_ts=NULL) {
-    $columnToHeaderMap = [ 
+    $columnToHeaderMap = array( 
         'dateUTC'=>'Time (UTC)', 
         'windSpeed'=>'Windspeed (mph)', 
         'windSpeedVar'=>'Windspeed Variance', 
         'windDir'=>'Wind Heading (deg)'
-    ];
+    );
     fputcsv($fobj, array_values($columnToHeaderMap));
 
     //Figure out which query to execute.
     if ($start_ts!=NULL) {
        if ($end_ts!=NULL) {
-           $wharf_query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+           $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
               " FROM wharf_data WHERE utime >= " . $start_ts . " and utime <= ". $end_ts ." ORDER BY utime asc";
        }
        else {
-           $wharf_query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+           $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
               " FROM wharf_data WHERE utime >= " . $start_ts . " ORDER BY utime asc";
        }
     } elseif ($end_ts!=NULL) {
-        $wharf_query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
-            " FROM wharf_data WHERE date(dateUTC) = '" . $end_ts . "' ORDER BY utime asc";
+        $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+            " FROM wharf_data WHERE utime <= " . $end_ts . " ORDER BY utime asc";
     } else {
-        $wharf_query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
-            " FROM wharf_data WHERE utime > " . (time()-24*3600*14) . " ORDER BY utime asc";
+        $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+            " FROM wharf_data WHERE utime >= " . (time()-24*3600*14) . " ORDER BY utime asc";
     }
 
-    query_and_emit_csv($fobj, $wharf_query);
+    //query_and_emit_csv($fobj, $query);
 
 }
 
-function make_solar_csv( $fobj, $start_ts, $end_ts){}
+function make_solar_csv( $fobj, $start_ts, $end_ts){
+/*    $columnToHeaderMap = [
+        '' => '',
+        '' => '',
+        '' => '',
+        '' => ''
+        ];*/
+    $columnToHeaderMap = array();
+    fputcsv($fobj, array_value($columnToHeaderMap));
+
+    if ($start_ts!=NULL){
+        if ($end_ts!=NULL) {
+            $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+                " FROM solar_data WHERE utime >= " . $start_ts . " and utime <= " . $end_ts . " ORDER BY utime asc";
+        } else {
+            $query = "SELECT " . join(',', array_keys($columnToHeaderMap)) .
+                " FROM solar_data WHERE utime >= " . $start_ts . " ORDER BY utime asc";
+        }
+    } elseif ($end_ts!=NULL) {
+        $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+            " FROM solar_data WHERE utime <= " . $end_ts . " ORDER BY utime asc";
+    } else {
+        $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
+            " FROM wharf_data WHERE utime >= " . (time()-24*3600*14) . "ORDER BY utime asc";
+    }
+
+    query_and_emit_csv($fobj, $query);
+
+}
+
+function make_wind_csv( $fobj, $start_ts, $end_ts){
+    //needs way more work than SOLAR OR WEATHER
+}
 
 
 
@@ -62,6 +94,9 @@ header("Content-type: txt/csv");
 header("Content-Disposition: attachment; filename=test.csv");
 include('db_credentials.php');
 include_once('helpers.php');
+
+$dataNeeded = $_GET['type'];
+echo("Data Needed: $dataNeeded");
 
 //Pull UTC and unix timestamps from GET options
 $start_date_UTC = $_GET['start'];

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -vx
+FILES_TO_PUSH="download.php history.php helpers.php"
+REMOTE_PATH="/path/to/server/directory"
+#LOCAL_PATH=$(pwd) not needed
+REMOTE_USER="username"
+REMOTE_GROUP="groupname"
+REMOTE_URL="urltoserver.tld"
+SSH_PORT=22
+
+
+echo "Backing up previous files"
+#could we somehow reference pushes to a specific GIT commit hash or even push via a git hook, if all tests pass (or something)
+echo "Copying ${FILES_TO_PUSH} to ${REMOTE_URL} ${REMOTE_PATH}"
+scp -P $SSH_PORT $FILES_TO_PUSH "${REMOTE_USER}@${REMOTE_URL}:${REMOTE_PATH}"
+echo "Setting permissions"
+ssh $REMOTE_USER@$REMOTE_URL -p $SSH_PORT "cd ${REMOTE_PATH} && chown -v ${REMOTE_USER}:${REMOTE_GROUP} ${FILES_TO_PUSH}"
