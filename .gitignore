@@ -1,4 +1,4 @@
 *.pyo
 *.pyc
 db_credentials.php*
-push_to_server_and_test.sh
+*.sh
