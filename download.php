@@ -22,8 +22,20 @@
  *
  */
 
+require('Archive/Tar.php');
 
-function query_and_emit_csv($fobj, $query) {
+
+function emit_file($f){
+    $out=fopen(output, 'w');
+    while ( ! feof($f) ) {
+        fwrite($out, fgets($f));
+    }
+    fclose($out);
+}
+
+
+
+function query2csv($fobj, $query) {
     $rows = mysql_query($query) or die("Query Error: ". mysql_error());
     while( $row = mysql_fetch_assoc($rows) ) fputcsv($fobj, array_values($row), $delimeter=',', $enclosure=chr(0));
 }
@@ -54,7 +66,7 @@ function make_weather_csv( $fobj, $start_ts=NULL, $end_ts=NULL) {
         $query = "SELECT " . join(', ', array_keys($columnToHeaderMap)) .
             " FROM wharf_data WHERE utime >= " . (time()-24*3600*14) . " ORDER BY utime asc";
     }
-    query_and_emit_csv($fobj, $query);
+    query2csv($fobj, $query);
 }
 
 function make_solar_csv( $fobj, $start_ts, $end_ts){
@@ -83,7 +95,29 @@ function make_solar_csv( $fobj, $start_ts, $end_ts){
             " FROM solar_data  WHERE utime >= " . (time()-24*3600*14) . " ORDER BY utime asc";
     }
     
-    query_and_emit_csv($fobj, $query);
+    query2csv($fobj, $query);
+}
+
+function make_tarball_and_emit($file_list, $compress=null){
+    $fname='greenwarf-archive.tar'; //change to UUID of some sort
+    if ($compress=='gz'){
+        $fname .= '.gz';
+    } elseif ($compress=='bz2'){
+        $fname .= '.bz2';
+    }
+    $tar = new Archive_Tar($fname, $compress);
+    $tar->create($file_list) or die("Error creating archive!");
+    readfile($fname);
+    unlink($fname); //no caching... which should be done as we scale
+}
+
+
+function select_query_string($start_ts, $end_ts, &$wharf_query_string=NULL, &$solar_query_string=NULL){
+    if( ($wharf_query_string==NULL) and ($solar_query_string==NULL)){
+        return -1;
+    }
+
+    return 1;
 
 }
 
@@ -91,8 +125,6 @@ function make_wind_csv( $fobj, $start_ts, $end_ts){
     //needs way more work than SOLAR OR WEATHER
 }
 
-header("Content-type: txt/csv");
-header("Content-Disposition: attachment; filename=test.csv");
 include('db_credentials.php');
 include_once('helpers.php');
 
@@ -119,7 +151,15 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     header("Content-type: txt/csv");
     header("Content-Disposition: attachment; filename=solar.csv");
     make_solar_csv($output);
-
+} elseif (strtolower($type_of_csv) == 'all') {
+    header("Content-type: application/gzip");
+    header("Content-Disposition: attachment; filename=greenwharf-archive.tar");
+    $fList=array();
+    $a='tmp.txt';
+    array_push($fList, $a);
+    make_tarball_and_emit($fList);
+} else {
+    http_response_code(400);//bad request 
 }
 //make_weather_csv($output, $start_ts, $end_ts);
 fclose($output);
