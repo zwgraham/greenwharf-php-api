@@ -2,3 +2,8 @@
 *.pyc
 db_credentials.php*
 *.sh
+*.tgz
+*.tar.gz
+*.tar
+*.tar.bz2
+*.tbz
