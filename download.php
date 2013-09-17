@@ -1,6 +1,6 @@
 <?php
 
-/* File:  history.php
+/* File:  download.php
  * Author: Zachary Graham
  * Creation Date: 9/5/2013
  * Purpose: Create and return a csv file of wharf data
@@ -133,6 +133,7 @@ function make_wind_csv( $fobj, $start_ts, $end_ts){
 
 include('db_credentials.php');
 include_once('helpers.php');
+date_default_timezone_set( 'UTC'); //our storage timezone
 $start_ts=$end_ts=$type_of_csv=NULL;
 //Pull UTC and unix timestamps from GET options
 if(isset($_GET['start'])){
