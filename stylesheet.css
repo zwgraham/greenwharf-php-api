@@ -1,0 +1,147 @@
+@charset "UTF-8";
+/* CSS Document */
+/* ------ RESET Start ------ */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+/* ------ RESET End ------ */
+
+
+/* -- Default Body Properties--*/
+html, body {
+    height: 100%;
+	font-family: 'PT Serif', serif;
+	font-size: 16px;
+	color: #666666;
+    background: white;
+}
+
+body{
+    font-size: 62.5%;
+}
+
+/* -- Typographic Properties--*/
+
+h1 {
+	font-family: 'PT Sans Narrow', sans-serif;
+	font-size: 1.8em;
+	font-weight: 700;
+	line-height: 1.4em;
+	text-transform: uppercase;
+	color: black;
+}
+
+h2{
+	font-family: 'PT Sans', sans-serif;
+	font-size: 1.4em;
+	font-weight: 700;
+	line-height: 1em;
+	text-transform: capitalize;
+	margin-bottom: .4em;
+	color: #464646;
+}
+
+h1, h2 {
+	text-align: center;
+}
+
+p {
+	font-size: 1.2em;
+	line-height: 1.5em;
+	margin-bottom: 1em;
+	text-align: justify;
+}
+
+/*-- Top Bar --*/
+
+#topbar {
+background: #9ae0cc;
+border-bottom: 2px solid #669999;
+height: 1%;
+}
+
+/*-- Side Bar --*/
+
+aside {
+overflow: hidden;
+float:left;
+clear: left;
+min-width: 288px;
+max-width: 25%;
+background: #f7f7f7;
+height: 100%;
+border: 4px double #d9d9d9;
+}
+
+.asideform {
+width: 75%;
+margin-right: auto;
+margin-left: auto;
+}
+
+.asideform img{
+	display: block;
+	margin-top: 4em;
+	margin-bottom: 1em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*-- Dashboard --*/
+section {
+	float: left;
+	width: 60%;
+   overflow: hidden;
+}
+
+h1#dashtitle {
+position: relative;
+text-align: left;
+margin-top: 1em;
+margin-left: 1.4em;
+color: black;
+}
+
