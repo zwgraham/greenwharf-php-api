@@ -99,17 +99,22 @@ function makeSolarCSV( $fobj, $start_ts, $end_ts){
     query2csv($fobj, $query);
 }
 
-function make_tarball_and_emit($file_list, $compress=null){
-    $fname='greenwarf-archive.tar'; //change to UUID of some sort
-    if ($compress=='gz'){
-        $fname .= '.gz';
+function makeTarballAndEmit($file_list,$tarName, $compress=null){
+    /*if ($compress=='gz'){
+        $tarName .= '.gz';
     } elseif ($compress=='bz2'){
-        $fname .= '.bz2';
+        $tarName .= '.bz2';
+    }*/
+    $tar = new Archive_Tar($tarName, $compress);
+    file_put_contents("php://stdout", "Tarball Created ($tarName)\n");
+    foreach( $file_list as $name=>$handle){
+        file_put_contents("php://stdout", "\t$name added to tarball\n");
+        $tar->addString( $name, stream_get_contents($handle)) or die("Error adding $name to tarball");
     }
-    $tar = new Archive_Tar($fname, $compress);
-    $tar->create($file_list) or die("Error creating archive!");
-    readfile($fname);
-    unlink($fname); //no caching... which should be done as we scale
+    $f=fopen($tarName, 'r');
+    emit_file($f);
+    fclose($f);
+    unlink($tarName); //no caching... which should be done as we scale
 }
 
 
@@ -128,13 +133,19 @@ function make_wind_csv( $fobj, $start_ts, $end_ts){
 
 include('db_credentials.php');
 include_once('helpers.php');
-
+$start_ts=$end_ts=$type_of_csv=NULL;
 //Pull UTC and unix timestamps from GET options
-$start_date_UTC = $_GET['start'];
-$end_date_UTC   = $_GET['end'];
-$type_of_csv    = $_GET['type'];
-$start_ts       = strtotime($start_date_UTC);
-$end_ts         = strtotime($end_date_UTC);
+if(isset($_GET['start'])){
+    $start_date_UTC = $_GET['start'];
+    $start_ts       = strtotime($start_date_UTC);
+}
+if(isset($_GET['end'])){
+    $end_date_UTC   = $_GET['end'];
+    $end_ts         = strtotime($end_date_UTC);
+}
+if(isset($_GET['type'])){
+    $type_of_csv    = $_GET['type'];
+} 
 
 
 //Connect to database and execute query
@@ -153,12 +164,27 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     header("Content-Disposition: attachment; filename=solar.csv");
     makeSolarCSV($out, $start_ts, $end_ts);
 } elseif (strtolower($type_of_csv) == 'all') {
-    header("Content-type: application/gzip");
-    header("Content-Disposition: attachment; filename=greenwharf-archive.tar");
+    $weatherFile=fopen("php://temp", "rw+");
+    $solarFile=fopen("php://temp", "rw+");
+    if($weatherFile==$solarFile){
+        die("weatherfile==solarfile");
+    }
+    //$windFile=fopen("php://temp", "rw+");
+    makeWeatherCSV($weatherFile, $start_ts, $end_ts);
+    fseek($weatherFile, 0);
+    makeSolarCSV($solarFile, $start_ts, $end_ts);
+    fseek($solarFile, 0);
+    //makeWindCSV($windFile);
     $fList=array();
-    $a='tmp.txt';
-    array_push($fList, $a);
-    make_tarball_and_emit($fList);
+    $fList['weather.csv']=$weatherFile;
+    $fList['solar.csv']=$solarFile;
+    //$fList['wind.csv']=$windFile;
+    $name='greenwharf-archive.tar';
+    header("Content-type: application/tarball");
+    header("Content-Disposition: attachment; filename=$name");
+    makeTarballAndEmit($fList, $name);
+    fclose($weatherFile);
+    fclose($solarFile);
 } else {
     http_response_code(400);//bad request 
 }
