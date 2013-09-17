@@ -23,6 +23,7 @@
  */
 
 require('Archive/Tar.php');
+define("output", "php://output");
 
 
 function emit_file($f){
@@ -40,7 +41,7 @@ function query2csv($fobj, $query) {
     while( $row = mysql_fetch_assoc($rows) ) fputcsv($fobj, array_values($row), $delimeter=',', $enclosure=chr(0));
 }
 
-function make_weather_csv( $fobj, $start_ts=NULL, $end_ts=NULL) {
+function makeWeatherCSV( $fobj, $start_ts=NULL, $end_ts=NULL) {
     $columnToHeaderMap = array( 
         'dateUTC'=>'Time (UTC)', 
         'windSpeed'=>'Windspeed (mph)', 
@@ -69,7 +70,7 @@ function make_weather_csv( $fobj, $start_ts=NULL, $end_ts=NULL) {
     query2csv($fobj, $query);
 }
 
-function make_solar_csv( $fobj, $start_ts, $end_ts){
+function makeSolarCSV( $fobj, $start_ts, $end_ts){
     $columnToHeaderMap = [
         'Date_UTC' => 'Time (UTC)',
         'VoltsIn' => 'PV Voltage',
@@ -141,16 +142,16 @@ $conn = mysql_connect($host, $user, $pw) or die('Could not connect: ' . mysql_er
 mysql_select_db($db, $conn) or die('No Luck: ' . mysql_error() . "\n");
 
 /* open file */
-$output=fopen('php://output','w');
+$out=fopen(output,'w');
 
 if ( strtolower($type_of_csv) == 'weather' ) {
     header("Content-type: txt/csv");
     header("Content-Disposition: attachment; filename=weather.csv");
-    make_weather_csv($output); 
+    makeWeatherCSV($out, $start_ts, $end_ts); 
 } elseif ( strtolower($type_of_csv) == 'solar') {
     header("Content-type: txt/csv");
     header("Content-Disposition: attachment; filename=solar.csv");
-    make_solar_csv($output);
+    makeSolarCSV($out, $start_ts, $end_ts);
 } elseif (strtolower($type_of_csv) == 'all') {
     header("Content-type: application/gzip");
     header("Content-Disposition: attachment; filename=greenwharf-archive.tar");
@@ -161,7 +162,6 @@ if ( strtolower($type_of_csv) == 'weather' ) {
 } else {
     http_response_code(400);//bad request 
 }
-//make_weather_csv($output, $start_ts, $end_ts);
-fclose($output);
+fclose($out);
 
 ?>
