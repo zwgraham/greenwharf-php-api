@@ -73,10 +73,11 @@ function makeWeatherCSV( $fobj, $start_ts=NULL, $end_ts=NULL) {
 function makeSolarCSV( $fobj, $start_ts, $end_ts){
     $columnToHeaderMap = [
         'Date_UTC' => 'Time (UTC)',
-        'VoltsIn' => 'PV Voltage',
-        'AmpsIn' => 'PV Current',
-        'BatVolts' => 'Battery Voltage',
-        'AmpsOut' => 'Charging Current'
+        'VoltsIn' => 'PV Voltage (Volts)',
+        'AmpsIn' => 'PV Current (Amps)',
+        'BatVolts' => 'Battery Voltage (Volts)',
+        'AmpsOut' => 'Charging Current (Amps)',
+        'Round( AmpsOut*BatVolts*.2, 1 )' => 'Charging Power (Watt-hours)'
         ];
     fputcsv($fobj, array_values($columnToHeaderMap));
 
