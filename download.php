@@ -77,7 +77,8 @@ function makeSolarCSV( $fobj, $start_ts, $end_ts){
         'AmpsIn' => 'PV Current (Amps)',
         'BatVolts' => 'Battery Voltage (Volts)',
         'AmpsOut' => 'Charging Current (Amps)',
-        'Round( AmpsOut*BatVolts*.2, 1 )' => 'Charging Power (Watt-hours)'
+        /*'Round( AmpsOut*BatVolts*.2, 1 )' => 'Charging Power (Watt-hours)',*/
+        'TotChg' => 'Total Charge (amp hours?)'
         ];
     fputcsv($fobj, array_values($columnToHeaderMap));
 
@@ -140,14 +141,20 @@ $start_ts=$end_ts=$type_of_csv=NULL;
 if(isset($_GET['start'])){
     $start_date_UTC = $_GET['start'];
     $start_ts       = strtotime($start_date_UTC);
+} else {
+    $start_ts       = NULL;
 }
 if(isset($_GET['end'])){
     $end_date_UTC   = $_GET['end'];
     $end_ts         = strtotime($end_date_UTC);
+} else {
+    $end_ts         = NULL;
 }
 if(isset($_GET['type'])){
     $type_of_csv    = $_GET['type'];
-} 
+} else {
+    $type_of_csv     = NULL;
+}
 
 
 //Connect to database and execute query
