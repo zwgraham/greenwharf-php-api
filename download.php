@@ -138,7 +138,36 @@ function select_query_string($start_ts, $end_ts, &$wharf_query_string, &$solar_q
 }
 
 function make_wind_csv( $fobj, $start_ts, $end_ts){
-    //needs way more work than SOLAR OR WEATHER
+
+    $wharfColumnToHeaderMap = array(
+        'dateUTC'=>'Time (UTC)',
+        'windSpeed'=>'Windspeed (MPH)',
+        'windDir'=>'Wind Heading (Deg)',
+        'turbineAmps' => 'Wind Turbine Current (Amps)',
+        '24*turbineAmps' => 'Wind Turbine Power (Watts)'
+    );
+
+    fputcsv($fobj, array_values($wharfColumnToHeaderMap));
+
+    if ($start_ts!=NULL){
+        if ($end_ts!=NULL) {
+            $query = "SELECT " . join(', ', array_keys($wharfColumnToHeaderMap)) .
+                " FROM wharf_data WHERE utime >= " . $start_ts . " and utime <= " . $end_ts . " ORDER BY utime asc";
+        } else {
+            $query = "SELECT " . join(', ', array_keys($wharfColumnToHeaderMap)) .
+                " FROM wharf_data WHERE utime >= " . $start_ts . " ORDER BY utime asc"; 
+        }
+    } elseif ($end_ts!=NULL) {
+        $query = "SELECT " . join(', ', array_keys($wharfColumnToHeaderMap)) .
+            " FROM wharf_data WHERE utime <= " . $end_ts . " ORDER BY utime asc";
+    } else {
+        $query = "SELECT " . join(', ', array_keys($wharfColumnToHeaderMap)) .
+            " FROM wharf_data WHERE utime >= " . (time()-24*3600*14) . " ORDER BY utime asc";
+    }
+
+    query2csv($fobj, $query);
+    
+    
 }
 
 include('db_credentials.php');
@@ -152,6 +181,7 @@ if(isset($_GET['start'])){
 } else {
     $start_ts       = NULL;
 }
+
 if(isset($_GET['end'])){
     $end_date_UTC   = $_GET['end'];
     $end_ts         = strtotime($end_date_UTC);
@@ -187,14 +217,12 @@ if ( strtolower($type_of_csv) == 'weather' ) {
 } elseif (strtolower($type_of_csv) == 'wind' ) {
     header("Content-type: txt/csv");
     header("Content-Disposition: attachment; filename=wind.csv");
-    $sQuery=' ';
-    $wQuery=' ';
-    select_query_string($start_ts, $end_ts, $wQuery, $sQuery);
+    make_wind_csv($out, $start_ts, $end_ts);
 
 } elseif (strtolower($type_of_csv) == 'all') {
     $weatherFile=fopen("php://temp", "rw+");
     $solarFile=fopen("php://temp", "rw+");
-    //$windFile=fopen("php://temp", "rw+");
+    $windFile=fopen("php://temp", "rw+");
     $wQuery=' ';
     $sQuery=' ';
     select_query_string($start_ts, $end_ts, $wQuery, $sQuery);   
@@ -202,8 +230,8 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     fseek($weatherFile, 0);
     make_solar_csv($solarFile, $sQuery);
     fseek($solarFile, 0);
-    //make_wind_csv($windFile, $sQuery, $wQuery);
-    //fseek($windFile, 0);
+    make_wind_csv($windFile, $start_ts, $end_ts);
+    fseek($windFile, 0);
     $fList=array();
     $fList['weather.csv']=$weatherFile;
     $fList['solar.csv']=$solarFile;
