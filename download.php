@@ -63,7 +63,7 @@ function make_solar_csv( $fobj, $query){
     query2csv($fobj, $query);
 }
 
-function make_tarball_and_emit($file_list,$tarName, $compress=NULL){
+function make_tarball_and_emit($fobj, $file_list,$tarName, $compress=NULL){
     if ($compress=='gz'){
         $tarName .= '.gz';
     } elseif ($compress=='bz2'){
@@ -78,7 +78,7 @@ function make_tarball_and_emit($file_list,$tarName, $compress=NULL){
     $f=fopen($tarName, 'r');
     
     while ( ! feof($f) ) {
-        fwrite($out, fgets($f));
+        fwrite($fobj, fgets($f));
     }
 
     fclose($f);
@@ -239,7 +239,7 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     $name='greenwharf-archive.tar';
     header("Content-type: application/tarball");
     header("Content-Disposition: attachment; filename=$name");
-    make_tarball_and_emit($fList, $name);
+    make_tarball_and_emit($out, $fList, $name);
     fclose($weatherFile);
     fclose($solarFile);
 } else {
