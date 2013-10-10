@@ -26,7 +26,7 @@ require('Archive/Tar.php');
 define("output", "php://output");
 
 
-$solarColumnToHeaderMap = [
+$solarColumnToHeaderMap = array(
     'Date_UTC' => 'Time (UTC)',
     'VoltsIn' => 'PV Voltage (Volts)',
     'AmpsIn' => 'PV Current (Amps)',
@@ -34,7 +34,7 @@ $solarColumnToHeaderMap = [
     'AmpsOut' => 'Charging Current (Amps)',
     /*'Round( AmpsOut*BatVolts*.2, 1 )' => 'Charging Power (Watt-hours)',*/
     'TotChg' => 'Total Charge (amp hours?)'
-];
+);
 
 $wharfColumnToHeaderMap = array(
     'dateUTC'=>'Time (UTC)',
