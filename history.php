@@ -82,6 +82,7 @@ else {
 $json['windSpeed'] = array();
 $json['pyro'] = array();
 $json['turbine'] = array();
+$json['divert'] = array();
 $json['solar'] = array();
 
 /* Used to count total number of points used in wind direction
@@ -121,6 +122,7 @@ while ($row = mysql_fetch_assoc($resp)) {
    }
    if ((float) $row['pyro'] != 999) array_push($json['pyro'], array($row['utime']*1000, (float) $row['pyro']));
    if ((float) $row['turbineAmps'] != 999) array_push($json['turbine'], array($row['utime']*1000, (float) ($row['turbineAmps']*24.1)));
+   if ((float) $row['ADC2'] != 999) array_push($json['divert'], array($row['utime']*1000, (float) $row['ADC2']));
 }
 
 $resp = mysql_query($solar_query);
