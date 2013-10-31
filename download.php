@@ -201,18 +201,18 @@ mysql_select_db($db, $conn) or die('No Luck: ' . mysql_error() . "\n");
 
 /* open file */
 $out=fopen(output,'wb');
-
+$_tmp=NULL; //replaced $_tmp=NULL in following function calls due to PHP-Strict pass-by-reference violations
 if ( strtolower($type_of_csv) == 'weather' ) {
     header("Content-type: txt/csv");
     header("Content-Disposition: attachment; filename=weather.csv");
     $query=' ';
-    select_query_string($start_ts, $end_ts, $query, $_tmp=NULL);  //$_tmp=NULL is a hack to pass the value NULL by reference
+    select_query_string($start_ts, $end_ts, $query, $_tmp);  //$_tmp=NULL is a hack to pass the value NULL by reference
     make_weather_csv($out, $query); 
 } elseif ( strtolower($type_of_csv) == 'solar') {
     header("Content-type: txt/csv");
     header("Content-Disposition: attachment; filename=solar.csv");
     $query=' ';
-    select_query_string($start_ts, $end_ts, $_tmp=NULL, $query); //$_tmp=NULL is a hack to pass the value NULL by reference
+    select_query_string($start_ts, $end_ts, $_tmp, $query); //$_tmp=NULL is a hack to pass the value NULL by reference
     make_solar_csv($out, $query);
 } elseif (strtolower($type_of_csv) == 'wind' ) {
     header("Content-type: txt/csv");
