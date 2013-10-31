@@ -32,8 +32,7 @@ $solarColumnToHeaderMap = array(
     'AmpsIn' => 'PV Current (Amps)',
     'BatVolts' => 'Battery Voltage (Volts)',
     'AmpsOut' => 'Charging Current (Amps)',
-    /*'Round( AmpsOut*BatVolts*.2, 1 )' => 'Charging Power (Watt-hours)',*/
-    'TotChg' => 'Total Charge (amp hours?)'
+    'TotChg*BatVolts' => 'PV Power Stored in Batteries (Watt-hours)'
 );
 
 $wharfColumnToHeaderMap = array(
