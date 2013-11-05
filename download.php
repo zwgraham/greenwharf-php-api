@@ -245,6 +245,7 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     make_tarball_and_emit($out, $fList, $name);
     fclose($weatherFile);
     fclose($solarFile);
+    fclose($windFile);
 } else {
     http_response_code(400);//bad request 
 }
