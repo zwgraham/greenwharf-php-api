@@ -68,6 +68,8 @@ function make_tarball_and_emit($fobj, $file_list,$tarName, $compress=NULL){
     } elseif ($compress=='bz2'){
         $tarName .= '.bz2';
     }
+    header("Content-type: application/tarball");
+    header("Content-Disposition: attachment; filename=$tarName");
     $tar = new Archive_Tar($tarName, $compress);
     file_put_contents("php://stdout", "Tarball Created ($tarName)\n");
     foreach( $file_list as $name=>$handle){
@@ -240,8 +242,6 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     $fList['solar.csv']=$solarFile;
     $fList['wind.csv']=$windFile;
     $name='greenwharf-archive.tar';
-    header("Content-type: application/tarball");
-    header("Content-Disposition: attachment; filename=$name");
     make_tarball_and_emit($out, $fList, $name);
     fclose($weatherFile);
     fclose($solarFile);
