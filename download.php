@@ -86,6 +86,26 @@ function make_tarball_and_emit($fobj, $file_list,$tarName, $compress=NULL){
     unlink($tarName); //no caching... which should be done as we scale
 }
 
+function make_zip_archive_and_emit($fobj, $file_list, $zipName){
+    header("Content-type: application/zip");
+    header("Content-Disposition: attachment; filename=$zipName");
+    $zip=new ZipArchive();
+    $zip->open($zipName, ZipArchive::CREATE);
+    file_put_contents("php://stdout", "Zip Archive Created ($zipName)\n");
+    foreach( $file_list as $name=>$handle){
+        file_put_contents("php://stdout", "\t$name added to zipfile\n");
+        $zip->addFromString( $name, stream_get_contents($handle)) or die("Error adding $name to zip archive");
+    }
+    $zip->close();
+    $f=fopen($zipName, 'rb');
+
+    while ( ! feof($f) ) {
+        fwrite($fobj, fgets($f));
+    }
+    fclose($f);
+    unlink($zipName);
+
+}
 
 function select_query_string($start_ts, $end_ts, &$wharf_query_string, &$solar_query_string){
     global $wharfColumnToHeaderMap;
@@ -243,6 +263,28 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     $fList['wind.csv']=$windFile;
     $name='greenwharf-archive.tar';
     make_tarball_and_emit($out, $fList, $name);
+    fclose($weatherFile);
+    fclose($solarFile);
+    fclose($windFile);
+} else if( strtolower($type_of_csv) == 'zip' ) {
+    $weatherFile=fopen("php://temp", "rw+");
+    $solarFile=fopen("php://temp", "rw+");
+    $windFile=fopen("php://temp", "rw+");
+    $wQuery=' ';
+    $sQuery=' ';
+    select_query_string($start_ts, $end_ts, $wQuery, $sQuery);
+    make_weather_csv($weatherFile, $wQuery);
+    fseek($weatherFile, 0);
+    make_solar_csv($solarFile, $sQuery);
+    fseek($solarFile, 0);
+    make_wind_csv($windFile, $start_ts, $end_ts);
+    fseek($windFile, 0);
+    $fList=array();
+    $fList['weather.csv']=$weatherFile;
+    $fList['solar.csv']=$solarFile;
+    $fList['wind.csv']=$windFile;
+    $name="greenwharf-archive.zip";
+    make_zip_archive_and_emit($out, $fList, $name);
     fclose($weatherFile);
     fclose($solarFile);
     fclose($windFile);
