@@ -100,7 +100,8 @@ function make_zip_archive_and_emit($fobj, $file_list, $zipName){
     $f=fopen($zipName, 'rb');
 
     while ( ! feof($f) ) {
-        fwrite($fobj, fgets($f));
+          fwrite($fobj, stream_get_contents($f));
+//        fwrite($fobj, fgets($f));
     }
     fclose($f);
     unlink($zipName);
