@@ -22,6 +22,8 @@
  *
  */
 
+//@apache_setenv('no-gzip', 1);
+@ini_set('zlib.output_compression', 0);
 require('Archive/Tar.php');
 define("output", "php://output");
 
@@ -76,6 +78,7 @@ function make_tarball_and_emit($fobj, $file_list,$tarName, $compress=NULL){
         file_put_contents("php://stdout", "\t$name added to tarball\n");
         $tar->addString( $name, stream_get_contents($handle)) or die("Error adding $name to tarball");
     }
+    header("Content-Length: ".filesize($tarName)); 
     $f=fopen($tarName, 'r');
     
     while ( ! feof($f) ) {
@@ -97,6 +100,7 @@ function make_zip_archive_and_emit($fobj, $file_list, $zipName){
         $zip->addFromString( $name, stream_get_contents($handle)) or die("Error adding $name to zip archive");
     }
     $zip->close();
+    header("Content-Length: ".filesize($zipName));
     $f=fopen($zipName, 'rb');
 
     while ( ! feof($f) ) {
