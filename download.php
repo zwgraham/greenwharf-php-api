@@ -262,7 +262,7 @@ if ( strtolower($type_of_csv) == 'weather' ) {
     $fList['solar.csv']=$solarFile;
     $fList['wind.csv']=$windFile;
     $name='greenwharf-archive.tar';
-    make_tarball_and_emit($out, $fList, $name);
+    make_tarball_and_emit($out, $fList, $name, 'gz');
     fclose($weatherFile);
     fclose($solarFile);
     fclose($windFile);
