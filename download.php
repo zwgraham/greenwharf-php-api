@@ -171,9 +171,9 @@ function make_wind_csv( $fobj, $start_ts, $end_ts){
         'turbineAmps' => 'Wind Turbine Current (Amps)',
         'ADC2' => 'Divert-load (Amps)',
         '24*turbineAmps' => 'Wind Turbine Power (Watts)',
-        '.576*POWER(ADC2,2)' => 'Divert-load power (Watts)',
+        '.8*POWER(ADC2,2)' => 'Divert-load power (Watts)',
         '24*turbineAmps/6' => 'Wind Turbine Power (Watt-hours) rectangular estimate',
-        '.576*POWER(ADC2,2)/6' => 'Divert-load Power (Watt-hours) rectangular estimate'
+        '.8*POWER(ADC2,2)/6' => 'Divert-load Power (Watt-hours) rectangular estimate'
     );
 
     fputcsv($fobj, array_values($wharfColumnToHeaderMap));
