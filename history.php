@@ -17,6 +17,8 @@
  *           JSON object echoed has fields (windSpeed, pyro, turbineAmps, windDir) with
  *           data formatted for highcharts.
  */
+
+date_default_timezone_set('UTC');
  
 $directions = array("N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW");
 
