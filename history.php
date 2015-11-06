@@ -17,6 +17,8 @@
  *           JSON object echoed has fields (windSpeed, pyro, turbineAmps, windDir) with
  *           data formatted for highcharts.
  */
+
+date_default_timezone_set('UTC');
  
 $directions = array("N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW");
 
@@ -84,7 +86,7 @@ $json['pyro'] = array();
 $json['turbine'] = array();
 $json['divert'] = array();
 $json['solar'] = array();
-
+$json['battery'] = array();
 /* Used to count total number of points used in wind direction
  * and wind speed range calculations.
  */
@@ -128,7 +130,10 @@ while ($row = mysql_fetch_assoc($resp)) {
 $resp = mysql_query($solar_query);
 
 while ($row = mysql_fetch_assoc($resp)) {
-   if ($row['AmpsOut'] != 999 && $row['BatVolts'] != 999) array_push($json['solar'], array($row['utime']*1000, (float) ($row['AmpsOut']*$row['BatVolts'])));
+   if ($row['AmpsOut'] != 999 && $row['BatVolts'] != 999) {
+	array_push($json['solar'], array($row['utime']*1000, (float) ($row['AmpsOut']*$row['BatVolts'])));
+	array_push($json['battery'], array($row['utime']*1000, (float) ($row['BatVolts'])));
+  }
 }
 /* Calculate percent each wind direction gets at different speeds using the number
  * of points that fell within each range
